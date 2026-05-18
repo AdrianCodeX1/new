@@ -11,11 +11,20 @@ def stream():
         return jsonify({'error': 'Missing videoId'}), 400
 
     video_url = f'https://www.youtube.com/watch?v={video_id}'
+
     ydl_opts = {
         'format': 'bestaudio/best',
         'quiet': True,
         'no_warnings': True,
         'noplaylist': True,
+        'extract_flat': False,
+        'force_generic_extractor': False,
+        # Impersonate an Android phone to avoid bot detection
+        'user_agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
+        'extractor_args': {'youtube': {'player_client': ['android']}},
+        'http_headers': {
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
+        }
     }
 
     try:
@@ -29,6 +38,5 @@ def stream():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    # Render sets the PORT env variable automatically
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
